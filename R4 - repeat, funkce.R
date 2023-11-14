@@ -104,7 +104,7 @@ environment(ncol)
   methods(seq)
   body(seq.default)
   methods(summary)
-
+?methods
 # funkce primitivni
   sqrt
   body(sqrt)

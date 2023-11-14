@@ -127,7 +127,7 @@ ddply(.data = df, .variables = "diet", .fun = summarise,
 # to stejne v data table
 library(data.table)
 dt = as.data.table(df)
-# sumarizace prumerne hmotnosti a smodch hmotnost pres dietu a pohlavi
+# sumarizace prumerne hmotnosti a smodch hmotnosti pres dietu a pohlavi
 dt[,mean(weight), by = .(diet)] # prumerna hmotnost pro vsechny diety
 dt[,.(prumer = mean(weight), sdd = sd(weight)), by = .(diet, sex)] # prumerna hmotnost pro vsechny diety
 dt[,.N, by = .(diet, sex)]

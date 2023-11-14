@@ -1,3 +1,7 @@
+simulations = 100
+size_t = 100
+
+results = numeric(simulations)
 
 for (i in 1:100){
   pocet_polozek = sample(x = 1:15, size = 100, replace = T)
@@ -9,10 +13,6 @@ for (i in 1:100){
 }
 hist(results, main = "Simulation Results", xlab = "Total Time (days)", col = "lightblue")
 
-simulations = 100
-size_t = 100
-
-results = numeric(simulations)
 
 
 for (i in 1:simulations){
