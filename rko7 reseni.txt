@@ -1,0 +1,155 @@
+install.packages("microbenchmark")
+library(microbenchmark)
+install.packages("data.table")
+library(data.table)
+install.packages("memoise")
+library(memoise)
+library(compiler)
+balicky=c("microbenchmark","data.table","memoise")
+install.packages(balicky)
+for(i in balicky){
+  require(i,character.only = T)
+}
+# 1) Chceme vygenerovat tabulku x o 10 sloupcich a 100 radcich
+# sloupce budou mit nazvy pismenne (a:j)
+# hodnoty v tabulce budou pochazet z poissonova rozdeleni
+# se stredni hodnotou 10
+x=matrix(rpois(1e3,10),nrow = 100,ncol = 10)
+colnames(x)=letters[1:10]
+x2=data.frame(x)
+x3=data.table(x2)
+# 2) Chceme vytvorit tabulku y se stejnou strukturou jako x
+# a cetnosti nahradit relativnimi (kazda bunka/ radkovy soucet)
+y=matrix(0,nrow=100,ncol=10)
+
+system.time(
+for(i in 1:nrow(x)){
+  for(j in 1:ncol(x)){
+    y[i,j]=x[i,j]/sum(x[i,])
+  }
+}
+)
+f1=function(x,y){
+  for(i in 1:nrow(x)){
+    for(j in 1:ncol(x)){
+      y[i,j]=x[i,j]/sum(x[i,])
+    }
+  }
+}
+f2=function(x,y){
+  for(i in 1:nrow(x)){
+    y[i,]=x[i,]/sum(x[i,])
+  }
+}
+f3=function(x,y){
+  sumy=rowSums(x)
+  for(i in 1:nrow(x)){
+    y[i,]=x[i,]/sumy[i]
+  }
+}
+
+
+# Nepritel c.1 nastavovani hodnot
+f4=function(x,y){
+  sumy=rowSums(x)
+  y=NULL
+  for(i in 1:nrow(x)){
+    y=rbind(y,x[i,]/sumy[i])
+  }
+}
+# Prepsat f2 pres apply
+f5=function(x,y){
+  apply(X = x,MARGIN = 1,FUN = function(x){x/sum(x)})
+}
+
+microbenchmark(f1(x,y),f2(x,y),f3(x,y),f4(x,y),f5(x,y),
+               times = 10)
+
+# fce memoise
+f6=memoise(f1)
+microbenchmark(f1(x,y),f2(x,y),f3(x,y),f4(x,y),f5(x,y),f6(x,y),
+               times = 10)
+# bytova kompilace funkce
+f7=cmpfun(f1)
+microbenchmark(f1(x,y),f2(x,y),f3(x,y),f4(x,y),f5(x,y),f6(x,y),
+               f7(x,y),
+               times = 10)
+# JIT = just in time compilation
+# nastavuje se v parametrech prostredi a muze byt cislo 0:3
+# 3 je nejvyssi mira kompilace a je nastaveno defaultne
+
+# Lze kompilovat balicky pri instalaci (musite mit RTools)
+install.packages("multcomp",type="source",
+                 INSTALL_opts = "--byte-compile")
+
+# Kompilace souboru
+dump("f3",file = "f3.R")
+rm(f3)
+source("f3.R")
+cmpfile("f3.R") # ulozi kompilovanou fci
+loadcmp("f3.Rc") # nacte kompilovanou fci
+
+# Jak snizuje efektivitu vypoctu nespravny datovy typ
+
+microbenchmark(f1(x,y),f1(x2,y),times = 10)
+# ani ten typ zbytecne nemenime
+
+# prizpusobime vypocet sumarizacni funkci uvnitr data table
+x3=data.table(stack(data.frame(t(x))))
+
+f8=function(x3){
+x3[,.(values=values/sum(values)),by=.(ind)]
+}
+
+microbenchmark(f1(x,y),f2(x,y),f3(x,y),f4(x,y),f5(x,y),f6(x,y),
+               f7(x,y),f8(x3),f1(x2,y),
+               times = 10)
+# data table je skoro tak rychle jako matice
+
+# Pouziti podminek (if else vs. filtr)
+# Prevod pocetnosti v x2$a na binomickou pocetnost (kdyz = 0, tak 0,
+# kdyz > 0, 1)
+ff1=function(x2){
+for(i in 1:nrow(x2)){
+  if(x2$a[i]==0){
+    x2$abin[i]=0
+  } else {
+    x2$abin[i]=1
+  }
+}
+}
+ff2=function(x2){
+  x2$abin=ifelse(x2$a==0,0,1)
+}
+ff3=function(x2){
+  filtr=x2$a==0
+  x2$abin=0
+  x2$abin[filtr]=1
+}
+microbenchmark(ff1(x2),ff2(x2),ff3(x2),times=10)
+
+diff(x2$a)
+x2$a[2:length(x2$a)]-x2$a[1:(length(x2$a)-1)]
+
+# Zrychleni nacitani a ukladani
+# 1) Radeji mit vse v jednom souboru a nacitat co nejmene
+# 2) Zvolit spravny datovy typ pro ukladani
+# csv < RData (lepsi) < fread (funkce, ktera nacita do data table)
+write.table(x2,file = "tbl.csv",sep=";", row.names = F)
+# standardni nacitani
+microbenchmark(read.table("tbl.csv",header = T,sep=";"),
+fread("tbl.csv",header = T,sep = ";"),load("tbl.RData"))
+
+# ukladani jako RData
+save(x2,file = "tbl.RData")
+# nacitani jako RData
+load("tbl.RData")
+
+# Paralelni procesovani
+# Microsoft R Open
+
+
+
+
+
+

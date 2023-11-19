@@ -41,8 +41,8 @@ rm(x)
       c(1:3)%%2 # zbytek celociselneho deleni
 
 # chceme vypsat jen barvy, tedy liche prvky vektoru zelenina2
-zelenina2 [(1:length(zelenina2)%%2)==1] # aby bylo liche, zbatek se musi rovnat jedne, vypise barvy
-zelenina2 [(1:length(zelenina2)%%2)==0] # aby bylo sude, zbatek se musi rovnat nule, vypise zeleninu
+zelenina2 [(1:length(zelenina2)%%2)==1] # aby bylo liche, zbytek se musi rovnat jedne, vypise barvy
+zelenina2 [(1:length(zelenina2)%%2)==0] # aby bylo sude, zbytek se musi rovnat nule, vypise zeleninu
 
 # vyhledavani uvnitr retezcu
 grep(pattern = "paprika", x = zelenina) # najde pozice, kde to naslo papriku
