@@ -81,7 +81,6 @@ set.seed(42)
 # H1: hloubky hlasu jsou ruzne
 samci = rnorm(n = 30, mean = 393, sd = 20.3)
 samice = rnorm(n = 30, mean = 380, sd = 40.2)
-
 # test normality - H0: je normalni, H1: neni normalni
 shapiro.test(samci) # 0.35 > 0.05
 shapiro.test(samice) # 0.06 > 0.05
