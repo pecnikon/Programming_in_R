@@ -14,6 +14,7 @@ for(i in levels(df$diet)){
   print(mean(df$weight[df$diet == i]))
 }
 
+#_____________________________________________________________________________
 # FUNKCE TAPPLY
 tapply(X = df$weight, INDEX = df$diet, FUN = mean)
 tapply(X = df$weight, INDEX = df$diet, FUN = mean) [2] # zobrazi druhou hodnotu
@@ -44,12 +45,13 @@ tapply(X = df$weight,INDEX = df$diet, FUN = function(x){sd(x)/sqrt(length(x))}) 
 # Trideni dle vice faktoru
 df$sex = "M"
 df$sex[df$chick %in% 1:20] = "F"
+df$sex[df$chick[1:25]] = "M"
 df$sex = as.factor(df$sex)
 
 # spocitat prumernou hmotnost kurat v ruznych dietach pro kazde pohlavi zvlast
 tapply(X = df$weight, INDEX = list(df$diet, df$sex), FUN = mean, na.rm = T)
-
-# apply (aplikuje pres cely radek nebo cely sloupec)
+#_____________________________________________________________________________
+# APPLY (aplikuje pres cely radek nebo cely sloupec)
 apply(X = df, MARGIN = 2, class) # nefunguje, lze aplikovat pouze na matice
 
 data("AirPassengers") # time series, chci prevest do matice
@@ -58,7 +60,9 @@ plot(AirPassengers)
 attributes(AirPassengers) # vypise atributy
 attr(AirPassengers, which = "tsp")
 .preformat.ts(AirPassengsers)
-df2 = matrix(AirPassengers, ncol = 12, byrow = T, dimnames = list(rownames(.preformat.ts(AirPassengers)), colnames(.preformat.ts(AirPassengers))))
+df2 = matrix(AirPassengers, ncol = 12, byrow = T, 
+             dimnames = list(rownames(.preformat.ts(AirPassengers)), 
+                             colnames(.preformat.ts(AirPassengers))))
 
 #prumerny pocet pasazerupro vsechny mesice
 apply(X = df2, MARGIN = 2, mean)
@@ -101,6 +105,7 @@ sapply (X = l1, FUN = apply, MARGIN = 2, class) # funguje
 # _________________________________________________________________________
   # funkce REPLICATE je alternativa cyklu
 replicate(n = 10, expr = sample(c(T,F)))
+
 # <<- operator pro ukladani do global environment
 
 i = 1
@@ -108,7 +113,7 @@ replicate(10, expr = {
   i<<-i+1
   print(i)
 })
-
+#___________________________________________________________________________
 # mnohonasobna sumarizace
 # balicky plyr x data table (data table lepsi)
 install.packages("plyr")

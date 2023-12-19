@@ -72,7 +72,6 @@ tiff(filename = "graf_mysi.tiff",
 
 plot(mysi$blechy~mysi$vaha)
 dev.off()
-
 #________________________________________________________
 #________________________________________________________
 # SAMOSTATNA PRACE

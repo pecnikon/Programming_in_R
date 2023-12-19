@@ -21,7 +21,8 @@ iconv(zelenina, to = "ASCII//TRANSLIT")
 # evaluace textu
 x = c("zelenina")
 eval(parse(text = x)) # to same jako napsat zelenina
-
+?eval
+?parse
 rm(x)
 
 # jak rozpojit text na vice casti:
@@ -73,7 +74,7 @@ ted*ted2 # NELZE, nasobeni casovuch hodnot nedava smysl
 
 cas = "19.10.23 15hod 14min 01sek" # chceme z toho udelat spravny format
 ?strftime # zde najdu definici a pouziti formatu
-cas2 = as.POSIXct(cas, format = "%d.%m.%y %Hhod %Mmin %Ssek")
+ cas2 = as.POSIXct(cas, format = "%d.%m.%y %Hhod %Mmin %Ssek")
 
 # PODMINKY A SMYCKY
 
